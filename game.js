@@ -12,7 +12,7 @@ const win = [
     [2,4,6]
 ];
 const Board = (function(){
-    const combo = ['','','','','','','','',''];
+    let combo = ['','','','','','','','',''];
     return {
         getCombo: function(){
             return combo.slice();
@@ -28,5 +28,15 @@ const Board = (function(){
         }
     };
 })();
+const player = function(name, marker){
+    return{
+        getName: function(){
+           return name;
+        },
+        getMarker: function(){
+            return marker;
+        },
+    };
+};
 
 
