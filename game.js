@@ -50,7 +50,7 @@ function winner(){
             return cellOne; 
         }
     }
-    return "It's a draw"; 
+    return; 
 }
 function draw(){
     let draw = false;
@@ -63,41 +63,54 @@ const controlDisplay= (function(){
     let playing= "X";
     let gameActive = true;
     let ref = document.querySelector('.display-player');
+    let winnerRef = document.querySelector('.winner');
+    let currentPlayerName = "";
     return {
         cellUpdate: function(index, marker){
             const cell = document.querySelectorAll('.cell')[index];
             if(cell && cell.textContent==""){
                 cell.textContent= marker;
+                if(marker === 'X') {
+                    cell.classList.add('playerX');
+                } else if(marker === 'O') {
+                    cell.classList.add('playerO');
+                }
             }
         },
-        turn: function(){
+        turn: function(playerName){
             if(ref){
-            ref.textContent = "It's " + playing + "'s turn";
+                currentPlayerName = playerName;
+                ref.textContent = playerName;
             }
         },
         finalScore: function(winner){
             if(winner){
-            ref.textContent = winner + " Wins the game";
+                winnerRef.textContent = winner + 'Wins the game';
+                winnerRef.classList.remove('hide');
             }
             else{
-                ref.textContent= "It's a draw";
+                winnerRef.textContent= "It's a draw";
+                winnerRef.classList.remove('hide');
             }
             gameActive = false;
         },
         resetDisplay: function(){
             const cell = document.querySelectorAll('.cell');
-            cell.forEach(cells=> cells.textContent="");
+            cell.forEach(cells=> {
+                cells.textContent="";
+                cells.classList.remove('playerX', 'playerO');
+            });
             ref.textContent="";
+            winnerRef.classList.add('hide');
             Board.resetBoard();
             playing = "X";
             gameActive = true;
         },
         switchPlayer: function(){
-            if(playing ==="X"){
-                return "O";
-            }
-            else{
-                return "X";
+            if(playing === "X"){
+                playing = "O";
+            } else {
+                playing = "X";
             }
         },
         getCurrentPlayer: function(){
@@ -108,5 +121,72 @@ const controlDisplay= (function(){
         }
     }
 })();
-
-
+const GameController = (function() {
+    let players = [];
+    let nowPlaying = 0; 
+    let gameActive = false;
+    return {
+        StartGame: function() {
+            const PlayerOne = document.querySelector('#first').value || 'Player 1';
+            const PlayerTwo = document.querySelector('#second').value || 'Player 2';
+            players = [
+                player(PlayerOne, 'X'),
+                player(PlayerTwo, 'O')
+            ];
+            nowPlaying = 0;
+            gameActive = true;
+            this.action();
+            controlDisplay.resetDisplay();
+            controlDisplay.turn(players[nowPlaying].getName());
+        },
+        click: function(index) {
+            if (!gameActive || !Board.cellEmpty(index)) {
+                return;
+            }
+            const nowPlayerMarker = players[nowPlaying].getMarker();
+            Board.setCell(index, nowPlayerMarker);
+            controlDisplay.cellUpdate(index, nowPlayerMarker);
+            this.gameStatus();
+            if (gameActive) {
+                if(nowPlaying === 0){
+                    nowPlaying = 1;
+                } else {
+                    nowPlaying = 0;
+                }
+                controlDisplay.switchPlayer();
+                controlDisplay.turn(players[nowPlaying].getName());
+            }
+        },
+        restartGame: function() {
+            gameActive = true;
+            nowPlaying = 0;
+            controlDisplay.resetDisplay();
+            controlDisplay.turn(players[nowPlaying].getName());
+        },
+        gameStatus: function() {
+            const gameWinner = winner();
+            if (gameWinner) {
+                const winnerName = players.find(p => p.getMarker() === gameWinner).getName();
+                controlDisplay.finalScore(winnerName);
+                gameActive = false;
+                return;
+            }
+            if (draw()) {
+                controlDisplay.finalScore(null);
+                gameActive = false;
+            }
+        },
+        action: function() {
+            const cells = document.querySelectorAll('.cell');
+            cells.forEach((cell, index) => {
+                cell.addEventListener('click', () => this.click(index));
+            });
+            if (restart) {
+                restart.addEventListener('click', () => this.restartGame());
+            }
+        }
+    };
+})();
+document.addEventListener('DOMContentLoaded', function() {
+    GameController.StartGame();
+});
