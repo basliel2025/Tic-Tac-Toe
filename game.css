@@ -13,6 +13,9 @@ h1 , span , label{
     color: white;
     font-weight: bold;
 }
+span{
+    font-size: 26px;
+}
 
 select{
     cursor: pointer;
