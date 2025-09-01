@@ -1,4 +1,3 @@
-const cell = document.querySelectorAll('.cell');
 const displayer = document.querySelector('.display-player');
 const restart = document.querySelector('#restart');
 const win = [
@@ -39,7 +38,6 @@ const player = function(name, marker){
     };
 };
 function winner(){
-    let firstRound = false;
     for(let i=0;i< win.length; i++){
         const condition = win[i];
         const cellOne = Board.getCombo()[condition[0]];
@@ -49,11 +47,10 @@ function winner(){
             continue;
         }
         if(cellOne == cellTwo && cellTwo == cellThree){
-            firstRound = true;
-            break;
+            return cellOne; 
         }
     }
-    return firstRound;
+    return "It's a draw"; 
 }
 function draw(){
     let draw = false;
@@ -62,5 +59,54 @@ function draw(){
     }
     return draw;
 }
+const controlDisplay= (function(){
+    let playing= "X";
+    let gameActive = true;
+    let ref = document.querySelector('.display-player');
+    return {
+        cellUpdate: function(index, marker){
+            const cell = document.querySelectorAll('.cell')[index];
+            if(cell && cell.textContent==""){
+                cell.textContent= marker;
+            }
+        },
+        turn: function(){
+            if(ref){
+            ref.textContent = "It's " + playing + "'s turn";
+            }
+        },
+        finalScore: function(winner){
+            if(winner){
+            ref.textContent = winner + " Wins the game";
+            }
+            else{
+                ref.textContent= "It's a draw";
+            }
+            gameActive = false;
+        },
+        resetDisplay: function(){
+            const cell = document.querySelectorAll('.cell');
+            cell.forEach(cells=> cells.textContent="");
+            ref.textContent="";
+            Board.resetBoard();
+            playing = "X";
+            gameActive = true;
+        },
+        switchPlayer: function(){
+            if(playing ==="X"){
+                return "O";
+            }
+            else{
+                return "X";
+            }
+        },
+        getCurrentPlayer: function(){
+            return playing;
+        },
+        isGameActive: function(){
+            return gameActive;
+        }
+    }
+})();
 
 
