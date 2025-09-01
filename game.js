@@ -38,5 +38,29 @@ const player = function(name, marker){
         },
     };
 };
+function winner(){
+    let firstRound = false;
+    for(let i=0;i< win.length; i++){
+        const condition = win[i];
+        const cellOne = Board.getCombo()[condition[0]];
+        const cellTwo = Board.getCombo()[condition[1]];
+        const cellThree = Board.getCombo()[condition[2]];
+        if(cellOne == ""|| cellTwo==""|| cellThree==""){
+            continue;
+        }
+        if(cellOne == cellTwo && cellTwo == cellThree){
+            firstRound = true;
+            break;
+        }
+    }
+    return firstRound;
+}
+function draw(){
+    let draw = false;
+    if(!Board.getCombo().includes("")){
+        draw = true;
+    }
+    return draw;
+}
 
 
