@@ -28,9 +28,15 @@ const Board = (function(){
     };
 })();
 const player = function(name, marker){
+    let nameEntered = name;
     return{
         getName: function(){
-           return name;
+           return nameEntered;
+        },
+        setName: function(names){
+            if(names !== null){
+                nameEntered = names;
+            }
         },
         getMarker: function(){
             return marker;
@@ -85,7 +91,7 @@ const controlDisplay= (function(){
         },
         finalScore: function(winner){
             if(winner){
-                winnerRef.textContent = winner + 'Wins the game';
+                winnerRef.textContent = winner + ' Wins the game';
                 winnerRef.classList.remove('hide');
             }
             else{
@@ -183,6 +189,28 @@ const GameController = (function() {
             });
             if (restart) {
                 restart.addEventListener('click', () => this.restartGame());
+            }
+            const playerOneInput = document.querySelector('#first');
+            const playerTwoInput = document.querySelector('#second');
+            if(playerOneInput){
+                playerOneInput.addEventListener('input', function(){
+                    if(players.length ===2){
+                        players[0].setName(playerOneInput.value || 'player 1');
+                        if(controlDisplay.getCurrentPlayer()==='X'){
+                            controlDisplay.turn(players[0].getName());
+                        }
+                    }
+                });
+            }
+            if(playerTwoInput){
+                playerTwoInput.addEventListener('input', function(){
+                    if(players.length ===2){
+                        players[1].setName(playerTwoInput.value || 'player 2');
+                        if(controlDisplay.getCurrentPlayer()==='O'){
+                            controlDisplay.turn(players[1].getName());
+                        }
+                    }
+                });
             }
         }
     };
